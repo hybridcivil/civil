@@ -22,6 +22,7 @@ import {
   PRESET_SENTENCES,
   CipherFormat,
   EncodedToken,
+  SpaceMode,
 } from '../lib/cipherEngine.ts';
 import { audioSynth } from '../lib/audioSynth.ts';
 
@@ -41,14 +42,15 @@ export const EncoderSection: React.FC<EncoderSectionProps> = ({
   lang,
 }) => {
   const [format, setFormat] = useState<CipherFormat>('continuous');
+  const [spaceMode, setSpaceMode] = useState<SpaceMode>('word-length');
   const [copied, setCopied] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [activePlaybackIndex, setActivePlaybackIndex] = useState<number>(-1);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [selectedToken, setSelectedToken] = useState<EncodedToken | null>(null);
 
-  const encodeResult = encodeSentence(sentence, format);
-  const { tokens, encodedString, words, vowelTotal, consonantTotal } = encodeResult;
+  const encodeResult = encodeSentence(sentence, format, spaceMode);
+  const { tokens, encodedString, words, vowelTotal, consonantTotal, separatorTotal } = encodeResult;
 
   // Words breakdown by length
   const oneLetterWords = words.filter((w) => w.length === 1);
@@ -141,18 +143,95 @@ export const EncoderSection: React.FC<EncoderSectionProps> = ({
           <div className="flex items-center gap-3 self-start lg:self-auto shrink-0 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
-              <span className="text-slate-300 font-medium">{lang === 'bn' ? 'স্বরবর্ণ (Vowel: ১১–১৫)' : 'Vowels (11–15)'}</span>
+              <span className="text-slate-300 font-medium">{lang === 'bn' ? 'স্বরবর্ণ (১১–১৫)' : 'Vowels (11–15)'}</span>
             </div>
             <span className="text-slate-600">·</span>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>
-              <span className="text-slate-300 font-medium">{lang === 'bn' ? 'ব্যঞ্জনবর্ণ (Consonant: ২১–৪১)' : 'Consonants (21–41)'}</span>
+              <span className="text-slate-300 font-medium">{lang === 'bn' ? 'ব্যঞ্জনবর্ণ (২১–৪১)' : 'Consonants (21–41)'}</span>
             </div>
             <span className="text-slate-600">·</span>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block"></span>
-              <span className="text-slate-400 font-medium">{lang === 'bn' ? 'শব্দ ফাঁক (০০)' : 'Space (00)'}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+              <span className="text-slate-300 font-medium">{lang === 'bn' ? 'ডায়নামিক স্পেস (৫১–৫৯/৬১–৬৯)' : 'Dynamic Space (51–59)'}</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Dynamic Space Encryption Complexity Selector */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 sm:p-4 space-y-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{lang === 'bn' ? 'স্পেস এনক্রিপশন মেকানিজম (শব্দ ফাঁকের জটিলতা)' : 'Space Delimiter Complexity Mode'}</span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              {spaceMode === 'word-length' && (
+                lang === 'bn'
+                  ? '★ সক্রিয়: শব্দ দৈর্ঘ্যের সাথে স্পেস পরিবর্তিত হচ্ছে (১ অক্ষরে ৫১, ২ অক্ষরে ৫২, ৩ অক্ষরে ৫৩, ৪ অক্ষরে ৫৪...)!'
+                  : '★ Active: Spaces morph into 51-59 based on preceding word length (1L->51, 2L->52, 3L->53, 4L->54)!'
+              )}
+              {spaceMode === 'rotating-prime' && (
+                lang === 'bn'
+                  ? '★ সক্রিয়: প্রতিটি স্পেসে ক্রিপ্টিক প্রাইম কোড (৬১, ৬৩, ৬৭, ৬৯) চক্রাকারে ঘুরছে!'
+                  : '★ Active: Spaces cycle continuously through cryptic prime numbers (61, 63, 67, 69)!'
+              )}
+              {spaceMode === 'checksum' && (
+                lang === 'bn'
+                  ? '★ সক্রিয়: শব্দের অক্ষরমালার সংখ্যার যোগফল থেকে ডায়নামিক হ্যাশ কোড (৭০-৭৯) তৈরি হচ্ছে!'
+                  : '★ Active: Dynamic checksum hash (70-79) calculated from preceding letter codes!'
+              )}
+              {spaceMode === 'classic' && (
+                lang === 'bn'
+                  ? '★ সহজ মোড: সব স্পেসের জন্য পূর্বনির্ধারিত ০০ কোড ব্যবহৃত হচ্ছে।'
+                  : '★ Classic Mode: Fixed 00 used for spaces.'
+              )}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs shrink-0 self-start md:self-auto">
+            <button
+              onClick={() => setSpaceMode('word-length')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                spaceMode === 'word-length'
+                  ? 'bg-emerald-600 text-white font-medium shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {lang === 'bn' ? 'শব্দ-দৈর্ঘ্য (৫১–৫৯)' : 'Word-Length (51–59)'}
+            </button>
+            <button
+              onClick={() => setSpaceMode('rotating-prime')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                spaceMode === 'rotating-prime'
+                  ? 'bg-emerald-600 text-white font-medium shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {lang === 'bn' ? 'ঘূর্ণায়মান প্রাইম' : 'Rotating Primes'}
+            </button>
+            <button
+              onClick={() => setSpaceMode('checksum')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                spaceMode === 'checksum'
+                  ? 'bg-emerald-600 text-white font-medium shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {lang === 'bn' ? 'হ্যাশ (৭০–৭৯)' : 'Hash Checksum'}
+            </button>
+            <button
+              onClick={() => setSpaceMode('classic')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                spaceMode === 'classic'
+                  ? 'bg-slate-800 text-white font-medium shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {lang === 'bn' ? 'সহজ (০০)' : 'Classic (00)'}
+            </button>
           </div>
         </div>
       </div>

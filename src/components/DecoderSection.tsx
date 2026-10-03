@@ -348,9 +348,17 @@ export const DecoderSection: React.FC<DecoderSectionProps> = ({
                 badgeColor = 'text-cyan-300';
                 typeLabel = lang === 'bn' ? 'ব্যঞ্জনবর্ণ (Consonant)' : 'Consonant';
               } else if (step.type === 'separator') {
-                borderBg = 'border-slate-800 bg-slate-900/60';
-                badgeColor = 'text-slate-400';
-                typeLabel = lang === 'bn' ? 'শব্দ ফাঁক (Space)' : 'Space';
+                borderBg = 'border-emerald-500/30 bg-emerald-950/20';
+                badgeColor = 'text-emerald-400';
+                if (/^5[0-9]$/.test(step.tokenCode)) {
+                  typeLabel = lang === 'bn' ? `ডায়নামিক স্পেস (${step.tokenCode[1]}L)` : `Dyn Space (${step.tokenCode[1]}L)`;
+                } else if (/^6[0-9]$/.test(step.tokenCode)) {
+                  typeLabel = lang === 'bn' ? 'প্রাইম স্পেস' : 'Prime Space';
+                } else if (/^7[0-9]$/.test(step.tokenCode)) {
+                  typeLabel = lang === 'bn' ? 'হ্যাশ স্পেস' : 'Hash Space';
+                } else {
+                  typeLabel = lang === 'bn' ? 'শব্দ ফাঁক (Space)' : 'Space';
+                }
               } else if (!step.isValid) {
                 borderBg = 'border-rose-500/50 bg-rose-950/20';
                 badgeColor = 'text-rose-400';

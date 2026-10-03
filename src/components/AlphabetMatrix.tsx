@@ -136,39 +136,29 @@ export const AlphabetMatrix: React.FC<AlphabetMatrixProps> = ({ lang }) => {
         </p>
       </div>
 
-      {/* Mathematical Variation Formula Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Mathematical Variation Formula Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Vowel Rule */}
         <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/20 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
-              {lang === 'bn' ? 'স্বরবর্ণের গাণিতিক নিয়ম' : 'Vowel Mathematical Variation'}
+              {lang === 'bn' ? 'স্বরবর্ণের গাণিতিক নিয়ম' : 'Vowel Variation'}
             </span>
             <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-900/60 text-amber-200">
-              Codes: 11 – 15
+              11 – 15
             </span>
           </div>
           <p className="text-xs text-amber-200/90 leading-relaxed">
             {lang === 'bn'
-              ? 'ইংরেজি স্বরবর্ণ (A, E, I, O, U) হলো ভাষার মূল সুর। তাই এদেরকে ১০ এর ঘরে (১১, ১২, ১৩, ১৪, ১৫) রাখা হয়েছে এবং উচ্চ হারমোনিক ফ্রিকোয়েন্সি (৫২৩ - ১০৪৬ Hz) দেওয়া হয়েছে।'
-              : 'Vowels (A, E, I, O, U) form the core harmonic vocal track. They are placed in the base-10 register (11 to 15) and voiced as bright sine chimes (523–1046 Hz).'}
+              ? 'ইংরেজি স্বরবর্ণ (A, E, I, O, U) ভাষার মূল সুর। ১০ এর ঘরে (১১-১৫) হারমোনিক ব্রাইট সাইন চাইম (৫২৩–১০৪৬ Hz)।'
+              : 'Vowels (A, E, I, O, U) form the core harmonic track in base-10 (11–15) voiced as bright sine chimes.'}
           </p>
-          <div className="pt-1 flex flex-wrap gap-2 text-xs font-mono">
-            <span className="bg-amber-950/80 px-2 py-1 rounded border border-amber-600/30 text-amber-300">
-              A = 11
-            </span>
-            <span className="bg-amber-950/80 px-2 py-1 rounded border border-amber-600/30 text-amber-300">
-              E = 12
-            </span>
-            <span className="bg-amber-950/80 px-2 py-1 rounded border border-amber-600/30 text-amber-300">
-              I = 13
-            </span>
-            <span className="bg-amber-950/80 px-2 py-1 rounded border border-amber-600/30 text-amber-300">
-              O = 14
-            </span>
-            <span className="bg-amber-950/80 px-2 py-1 rounded border border-amber-600/30 text-amber-300">
-              U = 15
-            </span>
+          <div className="pt-1 flex flex-wrap gap-1.5 text-xs font-mono">
+            <span className="bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/30 text-amber-300">A=11</span>
+            <span className="bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/30 text-amber-300">E=12</span>
+            <span className="bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/30 text-amber-300">I=13</span>
+            <span className="bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/30 text-amber-300">O=14</span>
+            <span className="bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/30 text-amber-300">U=15</span>
           </div>
         </div>
 
@@ -176,34 +166,46 @@ export const AlphabetMatrix: React.FC<AlphabetMatrixProps> = ({ lang }) => {
         <div className="p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-cyan-300">
-              {lang === 'bn' ? 'ব্যঞ্জনবর্ণের গাণিতিক নিয়ম' : 'Consonant Structural Variation'}
+              {lang === 'bn' ? 'ব্যঞ্জনবর্ণের গাণিতিক নিয়ম' : 'Consonant Structure'}
             </span>
             <span className="font-mono text-xs px-2 py-0.5 rounded bg-cyan-900/60 text-cyan-200">
-              Codes: 21 – 41
+              21 – 41
             </span>
           </div>
           <p className="text-xs text-cyan-200/90 leading-relaxed">
             {lang === 'bn'
-              ? 'ইংরেজি ব্যঞ্জনবর্ণ (B থেকে Z) হলো ভাষার কাঠামোগত ফ্রেম। এদের কোড ২১ থেকে শুরু হয়ে ৪১ পর্যন্ত ক্রমান্বয়ে সাজানো এবং গভীর পারকাসিভ সাউন্ড টোন বরাদ্দ।'
-              : 'Consonants (B to Z) form the structural articulation. Coded from 21 through 41 consecutively, voiced as resonant triangle bass hits (164–739 Hz).'}
+              ? 'ব্যঞ্জনবর্ণ (B থেকে Z) ভাষার কাঠামোগত ফ্রেম। ২১ থেকে ৪১ পর্যন্ত সুনির্দিষ্ট ক্রমে বিন্যস্ত এবং গভীর রেজোন্যান্ট বেস সাউন্ড।'
+              : 'Consonants (B to Z) form structural articulation from 21 through 41 consecutively.'}
           </p>
-          <div className="pt-1 flex flex-wrap gap-1.5 text-xs font-mono">
-            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">
-              B=21
-            </span>
-            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">
-              C=22
-            </span>
-            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">
-              D=23
-            </span>
+          <div className="pt-1 flex flex-wrap gap-1 text-xs font-mono">
+            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">B=21</span>
+            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">C=22</span>
             <span className="text-slate-500">...</span>
-            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">
-              T=36
+            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">T=36</span>
+            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">Z=41</span>
+          </div>
+        </div>
+
+        {/* Dynamic Space Complexity Rule */}
+        <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+              {lang === 'bn' ? 'স্পেসের ডায়নামিক বৈচিত্র্য' : 'Dynamic Space Variation'}
             </span>
-            <span className="bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-600/30 text-cyan-300">
-              Z=41
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-200">
+              51 – 59 / 61 – 69
             </span>
+          </div>
+          <p className="text-xs text-emerald-200/90 leading-relaxed">
+            {lang === 'bn'
+              ? 'স্পেস আর অনুমানযোগ্য ০০ নয়! ১ অক্ষরের পর ৫১, ২ অক্ষরের পর ৫২, ৩ অক্ষরের পর ৫৩, ৪ অক্ষরের পর ৫৪, অথবা ঘূর্ণায়মান প্রাইমে পরিবর্তিত হয়।'
+              : 'Spaces avoid predictable "00" through dynamic shifts: 51 after 1L words, 52 after 2L, 53 after 3L, 54 after 4L, or rotating primes.'}
+          </p>
+          <div className="pt-1 flex flex-wrap gap-1 text-xs font-mono">
+            <span className="bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-600/30 text-emerald-300">1L=51</span>
+            <span className="bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-600/30 text-emerald-300">2L=52</span>
+            <span className="bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-600/30 text-emerald-300">3L=53</span>
+            <span className="bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-600/30 text-emerald-300">4L=54</span>
           </div>
         </div>
       </div>

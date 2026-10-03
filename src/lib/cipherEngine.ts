@@ -9,6 +9,8 @@
 
 export type LetterType = 'vowel' | 'consonant' | 'separator' | 'punctuation' | 'digit';
 
+export type SpaceMode = 'word-length' | 'rotating-prime' | 'checksum' | 'classic';
+
 export interface LetterDefinition {
   char: string;
   code: string;
@@ -156,6 +158,40 @@ for (let i = 0; i <= 9; i++) {
   };
 }
 
+// Populate Dynamic Word Delimiters / Sophisticated Space Codes:
+// 50 - 59: Length-Variant Space Codes (51 = after 1L word, 52 = after 2L word, 53 = after 3L word, 54 = after 4L word...)
+for (let i = 0; i <= 9; i++) {
+  const code = (50 + i).toString();
+  CODE_TO_CHAR[code] = {
+    char: ' ',
+    type: 'separator',
+    hz: 125 + i * 8,
+    label: i === 0 ? 'Space (Boundary)' : `Space (after ${i}-letter word)`,
+  };
+}
+
+// 60 - 69: Rotating Cryptic Prime Delimiters (61, 63, 67, 69...)
+for (let i = 0; i <= 9; i++) {
+  const code = (60 + i).toString();
+  CODE_TO_CHAR[code] = {
+    char: ' ',
+    type: 'separator',
+    hz: 135 + i * 6,
+    label: `Cryptic Rotating Space (${code})`,
+  };
+}
+
+// 70 - 79: Checksum Harmonic Hash Delimiters
+for (let i = 0; i <= 9; i++) {
+  const code = (70 + i).toString();
+  CODE_TO_CHAR[code] = {
+    char: ' ',
+    type: 'separator',
+    hz: 145 + i * 5,
+    label: `Checksum Hash Space (${code})`,
+  };
+}
+
 /**
  * Encode a single character
  */
@@ -220,9 +256,13 @@ export function encodeCharacter(char: string): EncodedToken | null {
 }
 
 /**
- * Encode an entire sentence into tokens and formatted strings
+ * Encode an entire sentence into tokens and formatted strings with dynamic space variation
  */
-export function encodeSentence(sentence: string, format: CipherFormat = 'continuous'): {
+export function encodeSentence(
+  sentence: string,
+  format: CipherFormat = 'continuous',
+  spaceMode: SpaceMode = 'word-length'
+): {
   tokens: EncodedToken[];
   encodedString: string;
   words: WordAnalysis[];
@@ -230,6 +270,7 @@ export function encodeSentence(sentence: string, format: CipherFormat = 'continu
   consonantTotal: number;
   separatorTotal: number;
   punctuationTotal: number;
+  spaceMode: SpaceMode;
 } {
   const tokens: EncodedToken[] = [];
   let vowelTotal = 0;
@@ -237,8 +278,66 @@ export function encodeSentence(sentence: string, format: CipherFormat = 'continu
   let separatorTotal = 0;
   let punctuationTotal = 0;
 
+  // Track the current word before space to compute dynamic word-length or checksum space codes
+  let currentWordChars: string[] = [];
+  let currentWordLetterCodes: number[] = [];
+
+  const ROTATING_PRIMES = ['61', '63', '67', '69'];
+
   for (let i = 0; i < sentence.length; i++) {
     const char = sentence[i];
+
+    if (char === ' ') {
+      // Calculate dynamic space code based on selected spaceMode
+      let spaceCode = '00';
+      let spaceHz = 120;
+      const cleanLen = currentWordChars.join('').replace(/[^a-zA-Z]/g, '').length;
+
+      if (spaceMode === 'word-length') {
+        // Dynamic based on preceding word length (1L -> 51, 2L -> 52, 3L -> 53, 4L -> 54, etc.)
+        if (cleanLen >= 1 && cleanLen <= 8) {
+          spaceCode = (50 + cleanLen).toString();
+          spaceHz = 125 + cleanLen * 8;
+        } else if (cleanLen >= 9) {
+          spaceCode = '59';
+          spaceHz = 195;
+        } else {
+          spaceCode = '50';
+          spaceHz = 125;
+        }
+      } else if (spaceMode === 'rotating-prime') {
+        // Rotating cryptic prime sequence
+        spaceCode = ROTATING_PRIMES[separatorTotal % ROTATING_PRIMES.length];
+        spaceHz = 135 + (separatorTotal % 4) * 15;
+      } else if (spaceMode === 'checksum') {
+        // Checksum hash from preceding letters
+        const sum = currentWordLetterCodes.reduce((acc, val) => acc + val, 0);
+        const rem = sum % 10;
+        spaceCode = (70 + rem).toString();
+        spaceHz = 145 + rem * 8;
+      } else {
+        // Classic 00
+        spaceCode = '00';
+        spaceHz = 120;
+      }
+
+      tokens.push({
+        originalChar: ' ',
+        code: spaceCode,
+        type: 'separator',
+        indexInSentence: i,
+        frequencyHz: spaceHz,
+        isVowel: false,
+        isConsonant: false,
+      });
+
+      separatorTotal++;
+      // Reset current word trackers
+      currentWordChars = [];
+      currentWordLetterCodes = [];
+      continue;
+    }
+
     const encoded = encodeCharacter(char);
     if (encoded) {
       encoded.indexInSentence = i;
@@ -246,8 +345,12 @@ export function encodeSentence(sentence: string, format: CipherFormat = 'continu
 
       if (encoded.type === 'vowel') vowelTotal++;
       else if (encoded.type === 'consonant') consonantTotal++;
-      else if (encoded.type === 'separator') separatorTotal++;
       else if (encoded.type === 'punctuation') punctuationTotal++;
+
+      currentWordChars.push(char);
+      if (/^[a-zA-Z]$/.test(char)) {
+        currentWordLetterCodes.push(parseInt(encoded.code, 10));
+      }
     }
   }
 
@@ -300,9 +403,23 @@ export function encodeSentence(sentence: string, format: CipherFormat = 'continu
   } else if (format === 'hyphenated') {
     encodedString = tokens.map((t) => t.code).join('-');
   } else if (format === 'word-bracketed') {
-    encodedString = words
-      .map((w) => `[${w.length}L: ${w.tokens.map((t) => t.code).join('-')}]`)
-      .join(' 00 ');
+    // Reconstruct with dynamic space codes between brackets
+    const bracketParts: string[] = [];
+    let wordIdx = 0;
+
+    for (const tok of tokens) {
+      if (tok.type === 'separator') {
+        bracketParts.push(` ${tok.code} `);
+      } else if (tok.indexInSentence === 0 || tokens[tokens.indexOf(tok) - 1]?.type === 'separator') {
+        const w = words[wordIdx];
+        if (w) {
+          bracketParts.push(`[${w.length}L: ${w.tokens.map((t) => t.code).join('-')}]`);
+          wordIdx++;
+        }
+      }
+    }
+
+    encodedString = bracketParts.length > 0 ? bracketParts.join('') : words.map((w) => `[${w.length}L: ${w.tokens.map((t) => t.code).join('-')}]`).join(' 50 ');
   }
 
   return {
@@ -313,6 +430,7 @@ export function encodeSentence(sentence: string, format: CipherFormat = 'continu
     consonantTotal,
     separatorTotal,
     punctuationTotal,
+    spaceMode,
   };
 }
 
