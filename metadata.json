@@ -1,0 +1,6 @@
+{
+  "name": "NumVocalis - Numerical Sentence Cipher & Decoder",
+  "description": "Bidirectional text-to-number sentence cipher engine with vowel and consonant harmonic variations, word-length grouping (1, 2, 3, 4+ letters), continuous numeric streams, and auditory playback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
